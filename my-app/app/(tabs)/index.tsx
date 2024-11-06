@@ -1,70 +1,476 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import Header from "@/components/_comp/Header";
+import { BORDERRADIUS, COLORS, FONTSIZE, SPACING } from "@/constants/Theme";
+import { Link, router } from "expo-router";
+import { Earth, History, PlaneTakeoff, Ship } from "lucide-react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import React, { useRef } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  SafeAreaView,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  StatusBar,
+  Platform,
+  Button,
+} from "react-native";
+import { FlatGrid } from "react-native-super-grid";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useStore } from "@/stores/store";
+import BottomSheet, {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
+import FormService from "@/components/_comp/FormServices";
 
-export default function HomeScreen() {
+const queryClient = new QueryClient();
+export const HomeScreenR = () => {
+  const tabBarHeight = useBottomTabBarHeight();
+  const user = useStore((state) => state.user);
+  const [service, setService] = React.useState("");
+
+  const [items, setItems] = React.useState([
+    {
+      name: "Envoie express",
+      desc: "Vos colis arrivent à destination en un clin d'oeil. (5 jours)",
+      price: "12000 FR/KG",
+      code: "#fff",
+      icon: <PlaneTakeoff size={70} color={COLORS.bgcolor} />,
+      icon2: <PlaneTakeoff size={70} color={COLORS.textColoerWhite} />,
+    },
+    {
+      name: "Envoie Normal",
+      desc: "Profitez de tarifs avantageux pour vos envois de colis de 2 semaines.",
+      price: "9000 FR/KG",
+      code: "#fff",
+      icon: <PlaneTakeoff size={70} color={COLORS.bgcolor} />,
+      icon2: <PlaneTakeoff size={70} color={COLORS.textColoerWhite} />,
+    },
+    {
+      name: "Envoie Maritime",
+      desc: "Vos colis traversent les océans en toute sérénité avec notre service Envoie Maritime.",
+      price: "CBM(M3)",
+      code: "#fff",
+      icon: <Ship size={70} color={COLORS.bgcolor} />,
+      icon2: <Ship size={70} color={COLORS.textColoerWhite} />,
+    },
+
+    {
+      name: "Historiques",
+      desc: "Consultez l'historique de vos envois précédents.",
+      price: "CBM(M3)",
+      code: "#fff",
+      icon: <History size={70} color={COLORS.bgcolor} />,
+      icon2: <History size={70} color={COLORS.textColoerWhite} />,
+    },
+  ]);
+  const snapPoints = ["75%"];
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  // callbacks
+  const handlePresentModalPress = () => {
+    bottomSheetModalRef.current?.present();
+  };
+  const handleSheetChanges = React.useCallback((index: number) => {
+    // console.log("handleSheetChanges", index);
+    return;
+  }, []);
+
+  const fetchData = async () => {
+    const response = await fetch(
+      `http://localhost:9001/api/v01/reservation/${user?.id}`,
+      {
+        method: "GET",
+        headers: {
+          // "Content-type": "app"
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  };
+
+  const queryData = useQuery({
+    queryKey: ["cmmd2"],
+    queryFn: () => fetchData(),
+  });
+
+  // console.log(queryData.data);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <GestureHandlerRootView
+      style={{
+        flex: 1,
+        backgroundColor: "red",
+      }}
+    >
+      <SafeAreaView style={styles.ScreenConntaier}>
+        <Header />
+
+        <View style={styles.Welcome}>
+          <Text style={styles.WelcomeTitle}>Hey {user?.nom}!</Text>
+          <Text style={styles.WelcomeDesc}>Bonjour</Text>
+        </View>
+        <View style={styles.ScrollViewFlex}>
+          <View style={styles.HomeCard}>
+            <View>
+              <Text style={styles.HomeCardTitle}>Royal Cargo</Text>
+              <Text style={styles.HomeCardTitle}>Vos Colis,</Text>
+              <Text style={styles.HomeCardTitle}>Notre Priorité</Text>
+            </View>
+            <View>
+              <Earth size={100} color={COLORS.bgcolor} />
+            </View>
+          </View>
+        </View>
+
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
+          <View style={styles.ServiceContainer}>
+            <Text style={styles.ServiceTitle}>Nos services</Text>
+          </View>
+          <View style={{ paddingHorizontal: SPACING.space_20, flex: 1 }}>
+            <FlatGrid
+              showsVerticalScrollIndicator={false}
+              itemDimension={130}
+              data={items}
+              style={[styles.gridView, { marginBottom: tabBarHeight - 10 }]}
+              spacing={10}
+              renderItem={({ item }: any) => (
+                // <Link href={`/modalservice/${item.name}`}>
+                <TouchableOpacity
+                  onPress={() => {
+                    handlePresentModalPress();
+                    setService(item.name);
+                    queryData.refetch();
+                  }}
+                  // onPress={() =>
+                  //   router.navigate({
+                  //     pathname: "/modalservice",
+                  //     params: {
+                  //       id: item.name,
+                  //     },
+                  //   })
+                  // }
+                >
+                  <View
+                    style={[
+                      styles.itemContainer,
+                      {
+                        backgroundColor:
+                          item.name === "Historiques"
+                            ? COLORS.bgcolor
+                            : "#e4f0ff",
+                      },
+                    ]}
+                  >
+                    <View>
+                      {item.name === "Historiques" ? item.icon2 : item.icon}
+                    </View>
+                    <Text
+                      style={[
+                        styles.itemName,
+                        {
+                          color:
+                            item.name === "Historiques"
+                              ? COLORS.textColoerWhite
+                              : COLORS.bgcolor,
+                        },
+                      ]}
+                    >
+                      {item.name}
+                    </Text>
+                    <Text style={styles.itemCode}>{item.desc}</Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </View>
+      </SafeAreaView>
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          ref={bottomSheetModalRef}
+          onChange={handleSheetChanges}
+          snapPoints={snapPoints}
+        >
+          <BottomSheetView style={{ flex: 1, alignItems: "center" }}>
+            <View>
+              <View
+                style={{
+                  flex: 1,
+                  marginTop: SPACING.space_15,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: FONTSIZE.size_24,
+                    fontWeight: "bold",
+                    color: COLORS.bgcolor,
+                    textAlign: "center",
+                  }}
+                >
+                  {service}
+                </Text>
+                {service === "Historiques" ? (
+                  <View
+                    style={{
+                      flexGrow: 1,
+                      height: tabBarHeight - 100,
+                    }}
+                  >
+                    <FlatGrid
+                      itemDimension={200}
+                      data={queryData && queryData.data}
+                      // data={[]}
+                      style={[
+                        styles.gridView2,
+                        {
+                          marginBottom: tabBarHeight - 100,
+                        },
+                      ]}
+                      // staticDimension={300}
+                      // fixed
+
+                      spacing={10}
+                      renderItem={({ item }: any) => (
+                        <TouchableOpacity
+                          onPress={() => {
+                            router.navigate({
+                              pathname: "/modaldetail",
+                              params: {
+                                id: item.trackCode,
+                              },
+                            });
+                          }}
+                        >
+                          <View
+                            style={[
+                              styles.itemContainer2,
+                              // { backgroundColor: item.code }
+                            ]}
+                          >
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <View>
+                                <Text style={styles.itemName2}>
+                                  {item.service}
+                                </Text>
+                                <Text style={styles.itemDesc}>
+                                  {item.typec.length > 16
+                                    ? item.typec.toString().slice(0, 16) + "..."
+                                    : item.typec}
+                                </Text>
+                                <Text style={styles.itemStatus}>
+                                  {item.etat}
+                                </Text>
+                              </View>
+                              <View>
+                                {item.service == "Envoie express" ? (
+                                  <PlaneTakeoff size={80} color="#fff" />
+                                ) : item.service == "Envoie Normal" ? (
+                                  <PlaneTakeoff size={80} color="#fff" />
+                                ) : (
+                                  <Ship size={80} color="#fff" />
+                                )}
+                              </View>
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                      )}
+                      ListEmptyComponent={() => (
+                        <View style={styles.emptyContainer}>
+                          <Text style={styles.emptyText}>
+                            Aucune donnée disponible
+                          </Text>
+                        </View>
+                      )}
+                    />
+                  </View>
+                ) : (
+                  <FormService
+                    service={service}
+                    bottomSheetModalRef={bottomSheetModalRef}
+                    queryData={queryData && queryData}
+                  />
+                  // ""
+                )}
+              </View>
+            </View>
+          </BottomSheetView>
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
+  );
+};
+
+export default function TabTwoScreen() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <HomeScreenR />
+    </QueryClientProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  Welcome: {
+    marginTop: SPACING.space_20,
+    paddingHorizontal: SPACING.space_28,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+
+  WelcomeTitle: {
+    fontSize: FONTSIZE.size_40,
+    color: COLORS.bgcolor,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  WelcomeDesc: {
+    fontSize: FONTSIZE.size_24,
+
+    color: "#a4b0be",
+  },
+  ScreenConntaier: {
+    flex: 1,
+    backgroundColor: "#f5f6fa",
+    paddingVertical: Platform.OS == "android" ? SPACING.space_46 : 0,
+  },
+  ScrollViewFlex: {
+    marginTop: SPACING.space_16,
+    paddingHorizontal: SPACING.space_28,
+  },
+  HomeCard: {
+    position: "relative",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: SPACING.space_16,
+
+    borderRadius: BORDERRADIUS.radius_25,
+    padding: SPACING.space_15,
+    borderWidth: 2,
+    borderColor: COLORS.bgcolor,
+  },
+
+  HomeCardTitle: {
+    fontSize: FONTSIZE.size_24,
+    fontWeight: "bold",
+    color: COLORS.bgcolor,
+  },
+
+  HomeCardDesc: {
+    marginTop: SPACING.space_20,
+    fontSize: FONTSIZE.size_12,
+    color: COLORS.textColoerWhite,
+  },
+  //
+
+  ServiceContainer: {
+    marginTop: 10,
+    paddingHorizontal: SPACING.space_28,
+  },
+  ServiceTitle: {
+    fontSize: FONTSIZE.size_24,
+    color: COLORS.bgcolor,
+  },
+
+  CardServicesFlex: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+
+  gridView: {
+    flex: 1,
+  },
+  itemContainer: {
+    position: "relative",
+    overflow: "hidden",
+    justifyContent: "flex-start",
+
+    padding: 10,
+    height: 180,
+    borderRadius: BORDERRADIUS.radius_25,
+  },
+  itemName: {
+    fontSize: 16,
+    // color: COLORS.bgcolor,
+    fontWeight: "bold",
+  },
+  itemCode: {
+    fontWeight: "600",
+    fontSize: 12,
+    color: "#a4b0be",
+  },
+
+  gridView2: {
+    marginTop: 10,
+    flex: 1,
+    // backgroundColor: "red",
+    width: Dimensions.get("screen").width * 0.9,
+    // paddingBottom: 800,
+  },
+  itemContainer2: {
+    justifyContent: "flex-end",
+    borderRadius: 5,
+    padding: 10,
+    height: 120,
+    backgroundColor: COLORS.bgcolor,
+    // height: Dimensions.get("screen").height * 0.5,
+
+    // width: 2000,
+  },
+  itemName2: {
+    fontSize: FONTSIZE.size_24,
+    color: "#fff",
+    fontWeight: "600",
+  },
+  itemDesc: {
+    // fontWeight: "600",
+    fontSize: FONTSIZE.size_18,
+    color: "#fff",
+  },
+
+  itemStatus: {
+    // fontWeight: "600",
+    fontSize: FONTSIZE.size_14,
+    color: "#fff",
+  },
+
+  emptyContainer: {
+    // flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    height: Dimensions.get("screen").height * 0.5,
+    width: Dimensions.get("screen").width * 0.9,
+    // backgroundColor: "red",
+
+    // backgroundColor: "#f01", // Couleur de fond douce
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#a0a0a0", // Gris clair
+    textAlign: "center",
   },
 });
