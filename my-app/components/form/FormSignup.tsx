@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     fontSize: FONTSIZE.size_18,
     // fontWeight: "bold",
     marginBottom: 30,
-    // textAlign: "center",
+    textAlign: "center",
   },
   inputContainer: {
     marginBottom: 20,

@@ -73,8 +73,6 @@ export const TabTwoScreenRef = () => {
     queryFn: () => fetchData(),
   });
 
-  // console.log(queryData.data);
-
   React.useEffect(() => {
     queryData.refetch();
   }, [router]);

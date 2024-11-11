@@ -139,9 +139,9 @@ const WelcomeScreen = ({ navigation }: any) => {
         ]}
         style={styles.bg}
       >
-        <View>
+        {/* <View>
           <Text>RoyalCargo</Text>
-        </View>
+        </View> */}
         <View style={styles.homeContaierContent}>
           {/* FORM */}
           <View>

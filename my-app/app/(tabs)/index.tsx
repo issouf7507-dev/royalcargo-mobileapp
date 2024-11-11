@@ -243,7 +243,7 @@ export const HomeScreenR = () => {
                       style={[
                         styles.gridView2,
                         {
-                          marginBottom: tabBarHeight - 100,
+                          marginBottom: 350,
                         },
                       ]}
                       // staticDimension={300}

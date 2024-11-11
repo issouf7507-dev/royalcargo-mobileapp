@@ -10,26 +10,8 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
-      tabBar={(props) => <MyTabBar {...props} />}
-      // screenOptions={{
-      //   tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-      //   headerShown: false,
-      // }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{ headerShown: false }}
-        // options={{
-        //   title: "Home",
-        //   tabBarIcon: ({ color, focused }) => (
-        //     <TabBarIcon
-        //       name={focused ? "home" : "home-outline"}
-        //       color={color}
-        //     />
-        //   ),
-        // }}
-      />
+    <Tabs tabBar={(props) => <MyTabBar {...props} />}>
+      <Tabs.Screen name="index" options={{ headerShown: false }} />
       <Tabs.Screen name="explore" options={{ headerShown: false }} />
 
       <Tabs.Screen name="explore2" />

@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+id                Int      @id @default(autoincrement())
+  nom               String
+  prenoms           String
+  tel               String   @unique
+  email             String   @unique
+  password          String
+  verificationCode  String?  // Code de vérification envoyé
+  isVerified        Boolean   @default(false) // Indicateur de vérification
+  spinwheel   SpinWheel[]
+  reservations Reservation[] // Relation vers les réservations
+}
+
+model Reservation {
+  id        Int      @id @default(autoincrement())
+  nom       String
+  numero    String
+  etat      String
+  prix      Int
+  poids     Int
+  tailes    Int
+  daten     DateTime
+  condition Boolean
+  quantite  Int
+  images    String
+  service   String
+  typec     String
+
+  userId    Int      // Ajout d'une clé étrangère
+  user      User     @relation(fields: [userId], references: [id]) // Relation avec User
+}
+
+model SpinWheel {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  lastSpin    DateTime
+  prize       Prize[]
+}
+
+model Prize {
+  id          Int @id @default(autoincrement())
+  name        String
+  chance      Float
+  spinwheelId Int
+  spinwheel   SpinWheel @relation(fields: [spinwheelId], references: [id])
+  }
+
+
+model userdash {
+  id     Int    @id @default(autoincrement())
+  user   String @unique
+  passwd String
+}
+
+// royalcargo225.com
+// 

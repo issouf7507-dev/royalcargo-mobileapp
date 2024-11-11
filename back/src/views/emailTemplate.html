@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vérification de Compte</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333333;
+      }
+      .footer {
+        margin-top: 20px;
+        font-size: 0.8em;
+        color: #777777;
+      }
+      .btn {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Bienvenue !</h1>
+      <p>
+        Merci de vous être inscrit Notre app ROYALCARGO. Votre code de
+        vérification est :
+      </p>
+      <h2>{{verificationCode}}</h2>
+      <p>Veuillez entrer ce code pour vérifier votre compte.</p>
+      <div class="footer">
+        <p>Si vous n'avez pas créé de compte, ignorez cet e-mail.</p>
+      </div>
+    </div>
+  </body>
+</html>

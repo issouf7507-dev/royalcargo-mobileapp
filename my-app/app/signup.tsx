@@ -18,11 +18,13 @@ import Animated, { FadeInDown, FadeInRight } from "react-native-reanimated";
 import { signupSchema } from "@/libs/validations";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import FormSignin from "@/components/form/FormSignin";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import FormSignup from "@/components/form/FormSignup";
+import { useStore } from "@/stores/store";
 
 const signup = () => {
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const setVerifMail = useStore((state) => state.setVerificationMail);
   const {
     control: controlSignup,
     handleSubmit: handleSubmitSignup,
@@ -31,9 +33,61 @@ const signup = () => {
     resolver: yupResolver(signupSchema),
   });
 
+  const handleRegister = async (
+    email: string,
+    password: string,
+    tel: string,
+    nom: string,
+    prenoms: string
+  ) => {
+    try {
+      setIsLoading(true); // Activer le loader
+
+      const res = await fetch(`http://localhost:9001/api/v01/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({ email, password, tel, nom, prenoms }),
+      });
+      const data = await res.json();
+
+      setTimeout(() => {
+        setIsLoading(false);
+
+        // console.log(data);
+
+        if (res.ok) {
+          // Vérifiez si une erreur spécifique est renvoyée
+          if (data.error) {
+            Alert.alert("Erreur de connexion", data.error);
+          } else if (data.message) {
+            // Connexion réussie : enregistrez le token et redirigez l’utilisateur
+            console.log(data);
+            setVerifMail(data.email);
+            // setToken(data.token);
+            // setUser(data.user);
+            // router.push("/(tabs)/");
+
+            router.push("/verificationmail");
+            // Redirigez vers la page d’accueil ou tableau de bord
+          }
+        } else {
+          Alert.alert("Erreur de connexion", data.error);
+        }
+      }, 3000);
+    } catch (error) {
+      console.error("Erreur lors de la connexion :", error);
+    }
+  };
   // Fonction appelée lors de la soumission du formulaire
-  const onSubmit2 = (data: any) => {
-    Alert.alert("Connexion réussie aa", `Email: ${data.tel} `);
+  const onSubmit = (data: any) => {
+    // console.log(data);
+
+    handleRegister(data.email, data.password, data.tel, data.nom, data.prenoms);
+
+    // Alert.alert("Connexion réussie aa", `Email: ${data.tel} `);
     // Ici, tu peux ajouter la logique de connexion (API call, etc.)
   };
 
@@ -51,16 +105,14 @@ const signup = () => {
         ]}
         style={styles.bg}
       >
-        <View>
-          <Text>RoyalCargo</Text>
-        </View>
+        <View>{/* <Text>RoyssalCargo</Text> */}</View>
         <View style={styles.homeContaierContent}>
           {/* FORM */}
           <View>
             <FormSignup
               control={controlSignup}
               handleSubmit={handleSubmitSignup}
-              onSubmit={onSubmit2}
+              onSubmit={onSubmit}
               errors={errorsSignup}
             />
           </View>
