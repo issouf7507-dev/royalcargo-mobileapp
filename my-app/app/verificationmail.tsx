@@ -1,7 +1,6 @@
 import {
   Alert,
   Modal,
-  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,

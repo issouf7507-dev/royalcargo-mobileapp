@@ -1,7 +1,6 @@
 import {
   Alert,
   ImageBackground,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -17,11 +16,12 @@ import { loginSchema, signupSchema } from "@/libs/validations";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormSignin from "@/components/form/FormSignin";
-import { Link, router } from "expo-router";
+import { Link, router, useFocusEffect } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import { useStore } from "@/stores/store";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const WelcomeScreen = ({ navigation }: any) => {
+const signin = ({ navigation }: any) => {
   // ALL STATE
   const [loaderSlapScreen, setLoaderSlapScreen] = React.useState<boolean>(true);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -36,7 +36,7 @@ const WelcomeScreen = ({ navigation }: any) => {
     resolver: yupResolver(loginSchema),
   });
 
-  const handleLogin = async (email: string, password: string) => {
+  const handleLogin = async (tel: string, password: string) => {
     try {
       setIsLoading(true); // Activer le loader
 
@@ -46,7 +46,7 @@ const WelcomeScreen = ({ navigation }: any) => {
           "Content-Type": "application/json",
         },
 
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ tel, password }),
       });
       const data = await res.json();
 
@@ -62,10 +62,11 @@ const WelcomeScreen = ({ navigation }: any) => {
 
             setToken(data.token);
             setUser(data.user);
+
             router.push("/(tabs)/"); // Redirigez vers la page d’accueil ou tableau de bord
           }
         } else {
-          // Gestion des erreurs spécifiques selon le code de statut HTTP
+          // Gestion des erraeurs spécifiques selon le code de statut HTTP
           if (res.status === 401) {
             Alert.alert("Erreur", "Email ou mot de passe incorrect");
           } else if (res.status === 403) {
@@ -90,14 +91,25 @@ const WelcomeScreen = ({ navigation }: any) => {
   const onSubmit = (data: any) => {
     // router.push("/(tabs)/");
     // console.log(data);
-    handleLogin(data.email, data.password);
+    handleLogin(data.tel, data.password);
+    // controlSignin._reset();
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      setLoaderSlapScreen(false);
-    }, 3000);
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (useStore.getState().isAuthenticated()) {
+        setTimeout(() => {
+          setLoaderSlapScreen(false);
+          router.replace("/(tabs)/");
+        }, 3000);
+        // Redirigez vers la page principale si déjà connecté
+      } else {
+        setTimeout(() => {
+          setLoaderSlapScreen(false);
+        }, 3000);
+      }
+    }, [])
+  );
 
   if (loaderSlapScreen) {
     return (
@@ -176,7 +188,7 @@ const WelcomeScreen = ({ navigation }: any) => {
   );
 };
 
-export default WelcomeScreen;
+export default signin;
 
 const styles = StyleSheet.create({
   splashContaier: {

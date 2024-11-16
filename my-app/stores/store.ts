@@ -35,7 +35,7 @@ export const useStore = create<AuthState>()(
       user: null,
       verificationBoolean: false,
       verificationMail: null,
-      setToken: (token: string) => set({ token }),
+      setToken: (token: string | null) => set({ token }),
       setUser: (user: User) => set({ user }),
 
       setVerificationBoolean: (verificationBoolean: false) =>

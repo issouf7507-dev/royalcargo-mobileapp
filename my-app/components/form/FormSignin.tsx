@@ -19,7 +19,7 @@ const FormSignin = ({ control, handleSubmit, onSubmit, errors }: any) => {
         {/* <Text style={styles.label}>Email</Text> */}
         <Controller
           control={control}
-          name="email"
+          name="tel"
           render={({ field: { onChange, onBlur, value } }) => (
             <View style={styles.inputBox}>
               <View>
@@ -33,9 +33,9 @@ const FormSignin = ({ control, handleSubmit, onSubmit, errors }: any) => {
                 onBlur={onBlur}
                 onChangeText={onChange}
                 value={value}
-                placeholder="Email"
+                placeholder="Numero"
                 // placeholderTextColor={}
-                keyboardType="email-address"
+                // keyboardType="email-address"
                 autoCapitalize="none"
               />
             </View>

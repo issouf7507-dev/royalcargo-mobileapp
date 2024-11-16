@@ -1,4 +1,4 @@
-import { BORDERRADIUS, COLORS, FONTSIZE, SPACING } from "@/constants/Theme";
+import { COLORS, FONTSIZE, SPACING } from "@/constants/Theme";
 import { useStore } from "@/stores/store";
 import {
   focusManager,
@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-query";
 import { router, Stack, useFocusEffect } from "expo-router";
 import {
+  CircleHelp,
   Key,
   LogOut,
   Mail,
@@ -24,11 +25,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 const queryClient = new QueryClient();
 export const UserScreenRef = () => {
   const user = useStore((state) => state.user);
+  const setToken = useStore((state) => state.setToken);
+  const token = useStore((state) => state.token);
 
   const fetchData = async () => {
     const response = await fetch(
@@ -61,9 +63,6 @@ export const UserScreenRef = () => {
       queryData.refetch();
     }, [])
   );
-  // React.useEffect(() => {
-  //   queryData.refetch();
-  // }, [router]);
 
   React.useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
@@ -121,14 +120,14 @@ export const UserScreenRef = () => {
           </View>
           <View style={styles.CardRight}>
             <Text style={styles.CardText}>
-              {/* {queryData &&
+              {queryData.data &&
                 queryData.data.filter((item: any) => {
                   return (
                     item.etat == "Colis reçu" ||
                     item.etat == "Colis envoyé" ||
                     item.etat == "Arrivé a Abidjan"
                   );
-                }).length} */}
+                }).length}
             </Text>
             <Text style={{ color: COLORS.bgcolor, fontWeight: "bold" }}>
               Reservation (en cours)
@@ -147,22 +146,44 @@ export const UserScreenRef = () => {
           ]}
         >
           <View style={styles.ActionLine}>
-            <TouchableOpacity style={styles.PassLine}>
+            <TouchableOpacity
+              style={styles.PassLine}
+              onPress={() => router.push("/modalpassword")}
+            >
               <Key size={35} color={COLORS.bgcolor} />
               <Text style={styles.PassLinetext}>Changer mot de passe</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.PassLine}>
-              <Key size={35} color={COLORS.bgcolor} />
+            <TouchableOpacity
+              style={styles.PassLine}
+              onPress={() => {
+                router.push("/apropos");
+              }}
+            >
+              <CircleHelp size={35} color={COLORS.bgcolor} />
               <Text style={styles.PassLinetext}>A propos</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.PassLine}>
+            <TouchableOpacity
+              style={styles.PassLine}
+              onPress={() => {
+                router.push("/conditionuser");
+              }}
+            >
               <OctagonAlert size={35} color={COLORS.bgcolor} />
               <Text style={styles.PassLinetext}>Conditions d'utilisation</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.PassLine}>
               <LogOut size={35} color="red" />
-              <Text style={styles.PassLinetextd}>Deconnexion</Text>
+              <Text
+                style={styles.PassLinetextd}
+                onPress={() => {
+                  // useStore.getState().clearAuth(); // Réinitialise les données de connexion
+                  useStore.getState().clearAuth(); // Réinitialise les données de connexion
+                  router.replace("/");
+                }}
+              >
+                Deconnexion
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -288,7 +309,7 @@ const styles = StyleSheet.create({
   },
   ActionLine: {
     flexDirection: "column",
-    gap: SPACING.space_18,
+    gap: SPACING.space_24,
   },
 
   PassLinetext: {

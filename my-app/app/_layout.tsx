@@ -32,7 +32,7 @@ export default function RootLayout() {
 
   return (
     // <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-    <Stack>
+    <Stack initialRouteName="index">
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="signup" options={{ headerShown: false }} />
       <Stack.Screen name="verificationmail" options={{ headerShown: false }} />
@@ -49,6 +49,37 @@ export default function RootLayout() {
         options={{
           presentation: "modal",
           animation: "slide_from_left",
+        }}
+      />
+
+      <Stack.Screen
+        name="modalpassword"
+        options={{
+          presentation: "card",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="conditionuser"
+        options={{
+          presentation: "card",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="apropos"
+        options={{
+          presentation: "card",
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="detaisreservation"
+        options={{
+          presentation: "card",
+          headerShown: false,
         }}
       />
 

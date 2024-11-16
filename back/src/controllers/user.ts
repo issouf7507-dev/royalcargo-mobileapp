@@ -112,20 +112,21 @@ export const verifyUser = async (req: Request, res: Response) => {
 };
 // log user
 export const loginUser = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  // const { email, password } = req.body;
+  const { tel, password } = req.body;
 
-  if (typeof email !== "string" || typeof password !== "string") {
+  if (typeof tel !== "string" || typeof password !== "string") {
     return res.status(400).json({ error: "Valeur invalide" });
   }
 
   try {
     // Vérifier si l'utilisateur existe
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { tel },
     });
 
     if (!user) {
-      return res.status(401).json({ error: "Email ou mot de passe incorrect" });
+      return res.status(401).json({ error: "tel ou mot de passe incorrect" });
     }
 
     // Vérifier si le mot de passe est correct
@@ -135,11 +136,11 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 
     // Vérifier si l'utilisateur est bien vérifié
-    if (!user.isVerified) {
-      return res.status(403).json({
-        error: "Veuillez vérifier votre email avant de vous connecter",
-      });
-    }
+    // if (!user.isVerified) {
+    //   return res.status(403).json({
+    //     error: "Veuillez vérifier votre email avant de vous connecter",
+    //   });
+    // }
 
     // Créer un token JWT
     const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
@@ -194,5 +195,48 @@ export const updateUser = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  const userId = req.userId; // ID de l'utilisateur (récupéré du token JWT ou du corps de la requête)
+  const { oldPassword, newPassword } = req.body;
+
+  // Vérification des types
+  if (typeof oldPassword !== "string" || typeof newPassword !== "string") {
+    return res.status(400).json({ error: "Valeurs invalides" });
+  }
+
+  try {
+    // Récupérer l'utilisateur par ID
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    // Vérifier l'ancien mot de passe
+    const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isOldPasswordValid) {
+      return res.status(401).json({ error: "Ancien mot de passe incorrect" });
+    }
+
+    // Hasher le nouveau mot de passe
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Mettre à jour le mot de passe de l'utilisateur
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Mot de passe modifié avec succès" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Erreur serveur" });
   }
 };

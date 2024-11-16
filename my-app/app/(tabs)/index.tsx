@@ -1,7 +1,13 @@
 import Header from "@/components/_comp/Header";
 import { BORDERRADIUS, COLORS, FONTSIZE, SPACING } from "@/constants/Theme";
-import { Link, router } from "expo-router";
-import { Earth, History, PlaneTakeoff, Ship } from "lucide-react-native";
+import { Link, router, useFocusEffect } from "expo-router";
+import {
+  CircleX,
+  Earth,
+  History,
+  PlaneTakeoff,
+  Ship,
+} from "lucide-react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import React, { useRef } from "react";
@@ -9,13 +15,9 @@ import {
   StyleSheet,
   View,
   Text,
-  SafeAreaView,
-  Image,
   Dimensions,
   TouchableOpacity,
-  StatusBar,
   Platform,
-  Button,
 } from "react-native";
 import { FlatGrid } from "react-native-super-grid";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -31,12 +33,16 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import FormService from "@/components/_comp/FormServices";
+import ModalAdress from "@/components/_comp/ModalAdress";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const queryClient = new QueryClient();
 export const HomeScreenR = () => {
   const tabBarHeight = useBottomTabBarHeight();
   const user = useStore((state) => state.user);
   const [service, setService] = React.useState("");
+  const [modalVisible, setModalVisible] = React.useState<boolean>(false);
+  const [modalData, setModalData] = React.useState<any>(null);
 
   const [items, setItems] = React.useState([
     {
@@ -73,7 +79,7 @@ export const HomeScreenR = () => {
       icon2: <History size={70} color={COLORS.textColoerWhite} />,
     },
   ]);
-  const snapPoints = ["75%"];
+  const snapPoints = ["80%"];
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   // callbacks
   const handlePresentModalPress = () => {
@@ -109,6 +115,14 @@ export const HomeScreenR = () => {
     queryFn: () => fetchData(),
   });
 
+  useFocusEffect(
+    React.useCallback(() => {
+      if (useStore.getState().isAuthenticated() == false) {
+        router.push("/signup");
+      }
+      // console.log(useStore.getState().isAuthenticated());
+    }, [])
+  );
   // console.log(queryData.data);
 
   return (
@@ -120,6 +134,14 @@ export const HomeScreenR = () => {
     >
       <SafeAreaView style={styles.ScreenConntaier}>
         <Header />
+
+        {/*  */}
+
+        <ModalAdress
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          modalData={modalData}
+        />
 
         <View style={styles.Welcome}>
           <Text style={styles.WelcomeTitle}>Hey {user?.nom}!</Text>
@@ -232,20 +254,17 @@ export const HomeScreenR = () => {
                 {service === "Historiques" ? (
                   <View
                     style={{
-                      flexGrow: 1,
-                      height: tabBarHeight - 100,
+                      // flexGrow: 1,
+                      // flex: 1,
+                      height: Dimensions.get("window").height * 0.55,
+                      // height: tabBarHeight - 100,
                     }}
                   >
                     <FlatGrid
                       itemDimension={200}
                       data={queryData && queryData.data}
                       // data={[]}
-                      style={[
-                        styles.gridView2,
-                        {
-                          marginBottom: 350,
-                        },
-                      ]}
+                      style={[styles.gridView2, {}]}
                       // staticDimension={300}
                       // fixed
 
@@ -253,12 +272,14 @@ export const HomeScreenR = () => {
                       renderItem={({ item }: any) => (
                         <TouchableOpacity
                           onPress={() => {
-                            router.navigate({
-                              pathname: "/modaldetail",
-                              params: {
-                                id: item.trackCode,
-                              },
-                            });
+                            setModalVisible(true);
+                            setModalData(item);
+                            // router.navigate({
+                            //   pathname: "/modaldetail",
+                            //   params: {
+                            //     id: item.trackCode,
+                            //   },
+                            // });
                           }}
                         >
                           <View

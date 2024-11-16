@@ -4,7 +4,6 @@ import {
   StyleSheet,
   View,
   Text,
-  SafeAreaView,
   TouchableOpacity,
   ActivityIndicator,
   Platform,
@@ -16,15 +15,19 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { FlatGrid } from "react-native-super-grid";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { COLORS, FONTSIZE, SPACING } from "@/constants/Theme";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { PlaneTakeoff, Ship } from "lucide-react-native";
 import { useStore } from "@/stores/store";
+import ModalAdressActive from "@/components/_comp/ModalAdressActive";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const queryClient = new QueryClient();
 
 export const TabTwoScreenRef = () => {
   const tabBarHeight = useBottomTabBarHeight();
   const user = useStore((state) => state.user);
+  const [modalVisible, setModalVisible] = React.useState<boolean>(false);
+  const [modalData, setModalData] = React.useState<any>(null);
   const [items, setItems] = React.useState([
     { name: "TURQUOISE", code: "#1abc9c" },
     { name: "EMERALD", code: "#2ecc71" },
@@ -73,9 +76,12 @@ export const TabTwoScreenRef = () => {
     queryFn: () => fetchData(),
   });
 
-  React.useEffect(() => {
-    queryData.refetch();
-  }, [router]);
+  useFocusEffect(
+    React.useCallback(() => {
+      queryData.refetch();
+    }, [])
+  );
+
   if (queryData.isLoading)
     return (
       <View
@@ -105,6 +111,12 @@ export const TabTwoScreenRef = () => {
           </Text>
         </View>
 
+        <ModalAdressActive
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          modalData={modalData}
+        />
+
         <FlatGrid
           itemDimension={220}
           data={
@@ -126,12 +138,14 @@ export const TabTwoScreenRef = () => {
           renderItem={({ item }: any) => (
             <TouchableOpacity
               onPress={() => {
-                router.navigate({
-                  pathname: "/modaldetail",
-                  params: {
-                    id: item.id,
-                  },
-                });
+                setModalVisible(true);
+                setModalData(item);
+                // router.navigate({
+                //   pathname: "/modaldetail",
+                //   params: {
+                //     id: item.id,
+                //   },
+                // });
               }}
             >
               <View

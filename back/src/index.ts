@@ -26,5 +26,5 @@ app.use(user);
 app.use(reservation);
 
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server running on http://192.168.1.10:${port}`);
 });

@@ -54,7 +54,7 @@ const ModaldetailRef = () => {
     queryFn: () => fetchData(),
   });
 
-  console.log(queryData.data);
+  // console.log(queryData.data);
   return (
     <View style={styles.ScreenContaier}>
       <Stack.Screen
